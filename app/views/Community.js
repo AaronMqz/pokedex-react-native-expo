@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { SafeAreaView, Text, StyleSheet } from "react-native";
+import LanguageComponent from "../components/LanguageComponent";
 
 const Community = () => {
   return (
     <SafeAreaView style={styles.Container}>
-      <Text>Community</Text>
+      <LanguageComponent />
+      <Text>Community </Text>
     </SafeAreaView>
   );
 };

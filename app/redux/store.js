@@ -13,8 +13,8 @@ export default function Store() {
     rootReducer,
     composeWithDevTools(applyMiddleware(thunk))
   );
-
-  getPokemonListAction()(store.dispatch, store.getState);
+  let initialPageUrl = store.getState().pokemonReducer.nextPage;
+  getPokemonListAction(initialPageUrl)(store.dispatch, store.getState);
 
   return store;
 }

@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 
+import LanguageComponent from "../components/LanguageComponent";
 import { saveMyFavorite } from "../redux/pokemonDuck";
 
 const Favorites = () => {
@@ -22,10 +23,11 @@ const Favorites = () => {
 
   return (
     <SafeAreaView style={styles.Container}>
+      <LanguageComponent />
       <Text>Favorites</Text>
       <TextInput
         style={styles.ModalTextInput}
-        placeholder={"Enter route name before saving"}
+        placeholder={"Enter name before saving"}
         placeholderTextColor={"grey"}
         value={newRouteTitle}
         onChangeText={(text) => setNewRouteTitle(text)}

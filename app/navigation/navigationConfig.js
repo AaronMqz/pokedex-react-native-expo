@@ -10,7 +10,7 @@ export const navigationConfig = {
     inactiveTintColor: "#CC0000",
     activeTintColor: "#ffffff",
     style: {
-      backgroundColor: "#ff0000", //color you want to change
+      backgroundColor: "#ff0000",
     },
   },
   headerBarOptions: {

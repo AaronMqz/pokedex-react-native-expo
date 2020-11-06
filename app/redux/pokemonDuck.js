@@ -4,11 +4,14 @@ import useStorage from "../hooks/useStorage";
 // CONSTANTS
 let initalData = {
   isFetching: false,
+  nextPage: "https://pokeapi.co/api/v2/pokemon?limit=50",
   pokemons: [],
   currentPokemonSpecies: {},
   community: [],
   myFavorites: [],
   user: { name: "aaron" },
+  languages: ["en", "es"],
+  currentLanguageIndex: 0,
 };
 let FETCH_REQUEST = "FETCH_REQUEST";
 let FECTH_SUCCESS = "FECTH_SUCCESS";
@@ -17,6 +20,7 @@ let FECTH_SPECIES_SUCCESS = "FECTH_SPECIES_SUCCESS";
 let CLEAN_SPECIES = "CLEAN_SPECIES";
 let SAVE_FAVORITE = "SAVE_FAVORITE";
 let DELETE_FAVORITE = "DELETE_FAVORITE";
+let CHANGE_LANGUAGE = "CHANGE_LANGUAGE";
 
 // REDUCERS
 export default reducer = (state = initalData, { type, payload }) => {
@@ -26,7 +30,8 @@ export default reducer = (state = initalData, { type, payload }) => {
     case FECTH_SUCCESS:
       return {
         ...state,
-        pokemons: payload,
+        pokemons: state.pokemons.concat(payload.pokemons),
+        nextPage: payload.nextPage,
         isFetching: false,
       };
     case FETCH_FAILURE:
@@ -55,17 +60,22 @@ export default reducer = (state = initalData, { type, payload }) => {
         myFavorites: state.myFavorites.filter((item) => item !== payload),
         isFetching: false,
       };
+    case CHANGE_LANGUAGE:
+      return {
+        ...state,
+        currentLanguageIndex: payload,
+      };
     default:
       return state;
   }
 };
 
 // ACTIONS - THUNKS
-export let getPokemonListAction = () => (dispatch, getState) => {
-  const { getPokemonList } = useAPI();
+export let getPokemonListAction = (url) => (dispatch) => {
+  const { getPokemonList, getPokemonDetails } = useAPI();
   const { savePokemonListStorage, getPokemonListStorage } = useStorage();
 
-  const getStorage = async () => {
+  const getPokemonsFromStorage = async () => {
     const resultStorage = await getPokemonListStorage();
     dispatch({
       type: FECTH_SUCCESS,
@@ -76,15 +86,16 @@ export let getPokemonListAction = () => (dispatch, getState) => {
   const fetchData = async () => {
     try {
       dispatch({ type: FETCH_REQUEST });
-      const result = await getPokemonList();
+      const pokemonList = await getPokemonList(url);
+      const pokemonsResult = await getPokemonDetails(pokemonList.data.results);
       dispatch({
         type: FECTH_SUCCESS,
-        payload: result,
+        payload: { pokemons: pokemonsResult, nextPage: pokemonList.data.next },
       });
-      await savePokemonListStorage(result);
+      await savePokemonListStorage(pokemonsResult);
     } catch (error) {
       dispatch({ type: FETCH_FAILURE });
-      await getStorage();
+      await getPokemonsFromStorage();
       console.log("Error API::getPokemonList: ", error);
     }
   };
@@ -92,7 +103,7 @@ export let getPokemonListAction = () => (dispatch, getState) => {
   return fetchData();
 };
 
-export const getPokemonSpeciesAction = (url) => (dispatch, getState) => {
+export const getPokemonSpeciesAction = (url) => (dispatch) => {
   const { getPokemonSpecies } = useAPI();
   const replaceLineBreak = (text) => {
     return text.replace(/(\n|\f)/gm, " ");
@@ -141,14 +152,18 @@ export const getPokemonSpeciesAction = (url) => (dispatch, getState) => {
   return fetchData();
 };
 
-export let cleanPokemonSpeciesAction = () => (dispatch, getState) => {
+export let cleanPokemonSpeciesAction = () => (dispatch) => {
   dispatch({ type: CLEAN_SPECIES });
 };
 
-export let saveMyFavorite = (favorite) => (dispatch, getState) => {
+export let saveMyFavorite = (favorite) => (dispatch) => {
   dispatch({ type: SAVE_FAVORITE, payload: favorite });
 };
 
-export let deleteMyFavorite = (favorite) => (dispatch, getState) => {
+export let deleteMyFavorite = (favorite) => (dispatch) => {
   dispatch({ type: DELETE_FAVORITE, payload: favorite });
+};
+
+export let changeLanguage = (language) => (dispatch) => {
+  dispatch({ type: CHANGE_LANGUAGE, payload: language });
 };
