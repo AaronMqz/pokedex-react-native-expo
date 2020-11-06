@@ -1,16 +1,22 @@
 import { useAPI } from "../service/useAPI";
+import useStorage from "../hooks/useStorage";
 
 // CONSTANTS
 let initalData = {
   isFetching: false,
   pokemons: [],
   currentPokemonSpecies: {},
+  community: [],
+  myFavorites: [],
+  user: { name: "aaron" },
 };
 let FETCH_REQUEST = "FETCH_REQUEST";
 let FECTH_SUCCESS = "FECTH_SUCCESS";
 let FETCH_FAILURE = "FETCH_FAILURE";
 let FECTH_SPECIES_SUCCESS = "FECTH_SPECIES_SUCCESS";
 let CLEAN_SPECIES = "CLEAN_SPECIES";
+let SAVE_FAVORITE = "SAVE_FAVORITE";
+let DELETE_FAVORITE = "DELETE_FAVORITE";
 
 // REDUCERS
 export default reducer = (state = initalData, { type, payload }) => {
@@ -37,6 +43,18 @@ export default reducer = (state = initalData, { type, payload }) => {
         currentPokemonSpecies: {},
         isFetching: false,
       };
+    case SAVE_FAVORITE:
+      return {
+        ...state,
+        myFavorites: [...state.myFavorites, payload],
+        isFetching: false,
+      };
+    case DELETE_FAVORITE:
+      return {
+        ...state,
+        myFavorites: state.myFavorites.filter((item) => item !== payload),
+        isFetching: false,
+      };
     default:
       return state;
   }
@@ -45,18 +63,29 @@ export default reducer = (state = initalData, { type, payload }) => {
 // ACTIONS - THUNKS
 export let getPokemonListAction = () => (dispatch, getState) => {
   const { getPokemonList } = useAPI();
+  const { savePokemonListStorage, getPokemonListStorage } = useStorage();
+
+  const getStorage = async () => {
+    const resultStorage = await getPokemonListStorage();
+    dispatch({
+      type: FECTH_SUCCESS,
+      payload: resultStorage,
+    });
+  };
+
   const fetchData = async () => {
-    dispatch({ type: FETCH_REQUEST });
     try {
-      await getPokemonList().then((result) => {
-        dispatch({
-          type: FECTH_SUCCESS,
-          payload: result,
-        });
+      dispatch({ type: FETCH_REQUEST });
+      const result = await getPokemonList();
+      dispatch({
+        type: FECTH_SUCCESS,
+        payload: result,
       });
+      await savePokemonListStorage(result);
     } catch (error) {
       dispatch({ type: FETCH_FAILURE });
-      console.log("Error", error);
+      await getStorage();
+      console.log("Error API::getPokemonList: ", error);
     }
   };
 
@@ -69,10 +98,11 @@ export const getPokemonSpeciesAction = (url) => (dispatch, getState) => {
     return text.replace(/(\n|\f)/gm, " ");
   };
 
-  const fetchData2 = async () => {
+  const fetchData = async () => {
     dispatch({ type: FETCH_REQUEST });
     try {
       await getPokemonSpecies(url).then((result) => {
+        console.log("y eso 2");
         const favlorHash = {};
         result.data.flavor_text_entries.map((item) => {
           if (item.language.name === "en") {
@@ -109,9 +139,17 @@ export const getPokemonSpeciesAction = (url) => (dispatch, getState) => {
     }
   };
 
-  return fetchData2();
+  return fetchData();
 };
 
 export let cleanPokemonSpeciesAction = () => (dispatch, getState) => {
   dispatch({ type: CLEAN_SPECIES });
+};
+
+export let saveMyFavorite = (favorite) => (dispatch, getState) => {
+  dispatch({ type: SAVE_FAVORITE, payload: favorite });
+};
+
+export let deleteMyFavorite = (favorite) => (dispatch, getState) => {
+  dispatch({ type: DELETE_FAVORITE, payload: favorite });
 };

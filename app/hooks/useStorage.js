@@ -5,24 +5,24 @@ const useStorage = () => {
   const savePokemonListStorage = async (data) => {
     try {
       const jsonValue = JSON.stringify(data);
-      await AsyncStorage.setItem("@tracking", jsonValue);
+      await AsyncStorage.setItem("@pokemons", jsonValue);
     } catch (e) {
       // saving error
-      console.log("error al guardar", e);
+      console.log("Error saving in storage: ", e);
     }
   };
 
   const getPokemonListStorage = async () => {
     try {
-      const jsonValue = await AsyncStorage.getItem("@tracking");
+      const jsonValue = await AsyncStorage.getItem("@pokemons");
       return jsonValue != null ? JSON.parse(jsonValue) : [];
     } catch (e) {
       // error reading value
-      console.log("error al obtener", e);
+      console.log("Error getting from storage: ", e);
     }
   };
 
-  return { saveStorage, getStorage };
+  return { savePokemonListStorage, getPokemonListStorage };
 };
 
 export default useStorage;

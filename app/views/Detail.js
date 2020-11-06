@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   SafeAreaView,
   View,
@@ -14,6 +14,9 @@ import { FontAwesome } from "@expo/vector-icons";
 import {
   getPokemonSpeciesAction,
   cleanPokemonSpeciesAction,
+  getPokemonListAction,
+  saveMyFavorite,
+  deleteMyFavorite,
 } from "../redux/pokemonDuck";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
@@ -121,6 +124,10 @@ const getRandomFavlorText = (items) => {
 };
 
 const TextPokemoDescription = ({ items }) => {
+  /*const memoGetRandomFavlorText = useMemo(() => getRandomFavlorText(items), [
+    items,
+  ]);*/
+
   return (
     <View
       style={{
@@ -143,11 +150,15 @@ const TextPokemoDescription = ({ items }) => {
   );
 };
 
-const FavoriteIcon = () => {
-  const [isFavorite, setIsFavorite] = useState(false);
+const FavoriteIcon = ({ isFavorite, onPress }) => {
+  //const [isFavorite, setIsFavorite] = useState(isFavorite);
+  const handleOnPress = () => {
+    //setIsFavorite(!isFavorite);
+    onPress(!isFavorite);
+  };
 
   return (
-    <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
+    <TouchableOpacity onPress={() => handleOnPress()}>
       <FontAwesome
         name={isFavorite ? "heart" : "heart-o"}
         size={25}
@@ -163,13 +174,34 @@ const Detail = ({ route }) => {
   const pokemonSpecies = useSelector(
     (state) => state.pokemonReducer.currentPokemonSpecies
   );
+  const myFavorites = useSelector((state) => state.pokemonReducer.myFavorites);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
+    console.log("y eso");
     dispatch(getPokemonSpeciesAction(pokemon.species.url));
+
     return () => {
       dispatch(cleanPokemonSpeciesAction());
+      //dispatch(getPokemonListAction());
     };
   }, []);
+
+  useEffect(() => {
+    console.log("cambio");
+    let favoriteFound = myFavorites.filter((item) => {
+      return pokemon.name === item;
+    });
+    setIsFavorite(favoriteFound.length > 0 ? true : false);
+  }, [myFavorites]);
+
+  const handleFavorite = (value) => {
+    if (value) {
+      dispatch(saveMyFavorite(pokemon.name));
+    } else {
+      dispatch(deleteMyFavorite(pokemon.name));
+    }
+  };
 
   return (
     <SafeAreaView style={styles.Container}>
@@ -179,7 +211,10 @@ const Detail = ({ route }) => {
             <View style={styles.CardHeaderTitle}>
               <Text style={styles.CardHeaderTitleName}>{pokemon.name}</Text>
               <View style={styles.CardHeaderGroup}>
-                <FavoriteIcon />
+                <FavoriteIcon
+                  isFavorite={isFavorite}
+                  onPress={handleFavorite}
+                />
                 <Text style={styles.CardHeaderTitleNumber}>
                   #{pokemon.id.toString().padStart(3, "0")}
                 </Text>
@@ -213,7 +248,12 @@ const Detail = ({ route }) => {
                 <Text style={styles.CardBodyAboutLabel}>Weight</Text>
               </View>
             </View>
-            <TextPokemoDescription items={pokemonSpecies["en"]} />
+            {useMemo(
+              () => (
+                <TextPokemoDescription items={pokemonSpecies["en"]} />
+              ),
+              [pokemonSpecies["en"]]
+            )}
             <SliderPokemonStats stats={pokemon.stats} />
           </View>
         </View>

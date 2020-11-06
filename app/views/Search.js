@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Text,
   View,
@@ -11,13 +11,15 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SearchBar } from "react-native-elements";
+import { useSelector, useDispatch } from "react-redux";
 
-import { useSelector } from "react-redux";
+import { getPokemonListAction } from "../redux/pokemonDuck";
 
 const { width } = Dimensions.get("window");
 
 const Search = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const pokemons = useSelector((state) => state.pokemonReducer.pokemons);
 
   const renderItem = ({ item }) => {
