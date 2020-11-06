@@ -25,5 +25,10 @@ export const useAPI = () => {
     return result;
   };
 
-  return [getPokemonList];
+  const getPokemonSpecies = (url) => {
+    let result = axios.get(url);
+    return result;
+  };
+
+  return { getPokemonList, getPokemonSpecies };
 };

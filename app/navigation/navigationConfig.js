@@ -3,8 +3,6 @@ import Favorites from "../views/Favorites";
 import Search from "../views/Search";
 import Detail from "../views/Detail";
 
-console.log(1);
-
 export const navigationConfig = {
   initialRouteName: "search",
   iconsSize: 22,

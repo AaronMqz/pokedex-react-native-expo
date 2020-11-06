@@ -21,7 +21,6 @@ const Search = () => {
   const pokemons = useSelector((state) => state.pokemonReducer.pokemons);
 
   const renderItem = ({ item }) => {
-    console.log(item);
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate("Detail", { pokemon: item })}
