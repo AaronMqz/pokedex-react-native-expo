@@ -178,8 +178,7 @@ const Detail = ({ route }) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    console.log("y eso");
-    dispatch(getPokemonSpeciesAction(pokemon.species.url));
+    dispatch(getPokemonSpeciesAction(pokemon.speciesUrl));
 
     return () => {
       dispatch(cleanPokemonSpeciesAction());
@@ -188,7 +187,6 @@ const Detail = ({ route }) => {
   }, []);
 
   useEffect(() => {
-    console.log("cambio");
     let favoriteFound = myFavorites.filter((item) => {
       return pokemon.name === item;
     });
@@ -225,7 +223,7 @@ const Detail = ({ route }) => {
             </View>
             <Image
               source={{
-                uri: pokemon.sprites.other["official-artwork"].front_default,
+                uri: pokemon.spriteDeafult,
               }}
               style={styles.CardImage}
             />

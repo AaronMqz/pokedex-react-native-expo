@@ -102,7 +102,6 @@ export const getPokemonSpeciesAction = (url) => (dispatch, getState) => {
     dispatch({ type: FETCH_REQUEST });
     try {
       await getPokemonSpecies(url).then((result) => {
-        console.log("y eso 2");
         const favlorHash = {};
         result.data.flavor_text_entries.map((item) => {
           if (item.language.name === "en") {

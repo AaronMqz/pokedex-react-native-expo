@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect , useState} from "react";
 import {
   Text,
   View,
@@ -14,13 +14,29 @@ import { SearchBar } from "react-native-elements";
 import { useSelector, useDispatch } from "react-redux";
 
 import { getPokemonListAction } from "../redux/pokemonDuck";
+import { set } from "react-native-reanimated";
 
 const { width } = Dimensions.get("window");
 
 const Search = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const [searchText, setSearchText] = useState("")
   const pokemons = useSelector((state) => state.pokemonReducer.pokemons);
+
+  const handleSearch = (value)  => {
+    setSearchText(value)
+  }
+  
+  const filterPokemons = () => {
+    if(searchText.trim().length > 0){
+      return pokemons.filter((pokemon)=> {
+        return pokemon.name.toLowerCase().includes(searchText.toLowerCase().trim()) 
+      })
+    } else {
+      return pokemons
+    }
+  }
 
   const renderItem = ({ item }) => {
     return (
@@ -29,11 +45,12 @@ const Search = () => {
       >
         <View style={styles.Card}>
           <Image
-            source={{ uri: item.sprites.front_default }}
+            source={{ uri: item.spriteDeafult }}
             style={styles.CardImage}
           />
           <Text style={styles.CardTitle}>{item.name}</Text>
         </View>
+        <Text>search all pokemons</Text>
       </TouchableOpacity>
     );
   };
@@ -46,15 +63,18 @@ const Search = () => {
         showCancel={false}
         showLoading={false}
         lightTheme={true}
+        onChangeText={handleSearch}
+        value={searchText}
       />
       <FlatList
         style={styles.FlatList}
-        data={pokemons}
+        data={filterPokemons()}
         renderItem={renderItem}
         keyExtractor={(item) => item}
         numColumns={3}
         columnWrapperStyle={{ marginTop: 5, marginLeft: 5 }}
       />
+      
     </SafeAreaView>
   );
 };
@@ -74,6 +94,7 @@ const styles = StyleSheet.create({
     width: width / 3 - 10,
     height: 130,
     marginRight: 5,
+    padding: 10,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -89,12 +110,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   CardImage: {
-    height: 100,
-    width: "100%",
-    borderTopRightRadius: 12,
-    borderTopLeftRadius: 12,
-    borderBottomRightRadius: 12,
-    borderBottomLeftRadius: 12,
+    flex:1,
   },
 });
 

@@ -11,7 +11,17 @@ export const useAPI = () => {
           const pokemonsHash = {};
           const getAllRequest = result.data.results.map((item) => {
             return axios.get(item.url).then((result) => {
-              return (pokemonsHash[item.name] = result.data);
+              console.log(result.data.sprites.other)
+              return (pokemonsHash[item.name] = {
+                id: result.data.id,
+                name: result.data.name,
+                height: result.data.height,
+                weight: result.data.weight,
+                spriteDeafult:  result.data.sprites.other["official-artwork"].front_default,
+                speciesUrl: result.data.species.url,
+                types: result.data.types,
+                stats: result.data.stats
+              });
             });
           });
           return Promise.all(getAllRequest);
