@@ -1,23 +1,23 @@
-import Community from "../views/Community";
 import Favorites from "../views/Favorites";
 import Search from "../views/Search";
 import Detail from "../views/Detail";
+import { themeColors } from "../utils/colors";
 
 export const navigationConfig = {
   initialRouteName: "search",
   iconsSize: 22,
   tabBarOptions: {
-    inactiveTintColor: "#CC0000",
-    activeTintColor: "#ffffff",
+    inactiveTintColor: themeColors.secondary,
+    activeTintColor: themeColors.activeTintColor,
     style: {
-      backgroundColor: "#ff0000",
+      backgroundColor: themeColors.primary,
     },
   },
   headerBarOptions: {
     headerStyle: {
-      backgroundColor: "#ff0000",
+      backgroundColor: themeColors.primary,
     },
-    headerTintColor: "#fff",
+    headerTintColor: themeColors.activeTintColor,
   },
   stacks: [
     {
@@ -45,16 +45,6 @@ export const navigationConfig = {
         {
           name: "Detail",
           component: Detail,
-        },
-      ],
-    },
-    {
-      name: "Community",
-      icon: "users",
-      views: [
-        {
-          name: "Community",
-          component: Community,
         },
       ],
     },

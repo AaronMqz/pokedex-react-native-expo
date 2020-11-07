@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   SafeAreaView,
   Text,
@@ -11,30 +11,35 @@ import {
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import i18n from "../languages/i18n";
 
 import LanguageComponent from "../components/LanguageComponent";
+import Type from "../components/Type";
 import { getMyFavorites } from "../redux/pokemonDuck";
+import { typeColors } from "../utils/colors";
 
 const { width } = Dimensions.get("window");
-
-const Type = ({ types }) => {
-  return (
-    <React.Fragment>
-      {types.map((type, index) => {
-        return (
-          <View key={index} style={styles.TypeStyle}>
-            <Text style={styles.TypeStyleText}>{type.type.name}</Text>
-          </View>
-        );
-      })}
-    </React.Fragment>
-  );
-};
 
 const Favorites = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const myFavorites = useSelector((state) => state.pokemonReducer.myFavorites);
+  const currentLanguageIndex = useSelector(
+    (state) => state.pokemonReducer.currentLanguageIndex
+  );
+  const languages = useSelector((state) => state.pokemonReducer.languages);
+  const [languageChanged, setLanguageChanged] = useState(i18n.locale);
+
+  useEffect(() => {
+    i18n.locale = languages[currentLanguageIndex];
+    setLanguageChanged(i18n.locale);
+  }, [currentLanguageIndex]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: i18n.t("favorites.title"),
+    });
+  }, [languageChanged]);
 
   useEffect(() => {
     if (myFavorites.length === 0) {
@@ -43,10 +48,14 @@ const Favorites = () => {
   }, []);
 
   const renderItem = ({ item }) => {
+    const pickFirstType = item.types.find((e) => !!e);
+    const getColorType = typeColors[pickFirstType.type.name];
+
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate("Detail", { pokemon: item })}
       >
+        <LanguageComponent />
         <View style={styles.Card}>
           <View
             style={{
@@ -60,7 +69,7 @@ const Favorites = () => {
             </Text>
             <Text style={styles.CardTitle}>{item.name}</Text>
             <View style={styles.CardHeaderSubtitle}>
-              <Type types={item.types} />
+              <Type types={item.types} colorType={getColorType} />
             </View>
           </View>
           <Image
@@ -80,11 +89,6 @@ const Favorites = () => {
         renderItem={renderItem}
         keyExtractor={(item) => item.name}
         numColumns={1}
-        /*columnWrapperStyle={{
-          marginTop: 5,
-          marginLeft: 2,
-          marginRight: 2,
-        }}*/
       />
     </SafeAreaView>
   );
@@ -122,7 +126,6 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 25,
     marginLeft: 10,
-    //alignSelf: "center",
   },
   CardImage: {
     height: "100%",
@@ -137,23 +140,6 @@ const styles = StyleSheet.create({
   CardHeaderSubtitle: {
     flexDirection: "row",
     marginLeft: 10,
-  },
-  TypeStyle: {
-    backgroundColor: "red",
-    borderBottomLeftRadius: 14,
-    borderBottomRightRadius: 14,
-    borderTopRightRadius: 14,
-    borderTopLeftRadius: 14,
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingBottom: 3,
-    marginRight: 5,
-    marginTop: 5,
-    height: 30,
-    justifyContent: "center",
-  },
-  TypeStyleText: {
-    color: "#fff",
   },
 });
 

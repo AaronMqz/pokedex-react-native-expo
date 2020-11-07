@@ -3,7 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ButtonGroup } from "react-native-elements";
 import { changeLanguage } from "../redux/pokemonDuck";
 import { useSelector, useDispatch } from "react-redux";
-import i18n from "../languages/i18n";
+import { themeColors } from "../utils/colors";
 
 const OptionsComponent = ({ handleChangeLanguage, index }) => {
   return (
@@ -12,8 +12,10 @@ const OptionsComponent = ({ handleChangeLanguage, index }) => {
       selectedIndex={index}
       buttons={["EN", "ES"]}
       innerBorderStyle={{ color: "#fff" }}
-      selectedButtonStyle={{ backgroundColor: "red" }}
-      containerStyle={{ height: 30, width: 80 }}
+      selectedButtonStyle={{ backgroundColor: themeColors.primary }}
+      buttonStyle={{ backgroundColor: "#B0BEC5" }}
+      textStyle={{ color: "#CFD8DC" }}
+      containerStyle={{ height: 28, width: 85 }}
     />
   );
 };

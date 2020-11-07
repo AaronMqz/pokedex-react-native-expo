@@ -4,104 +4,44 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Dimensions,
   Text,
   Image,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { FontAwesome } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import i18n from "../languages/i18n";
+import Type from "../components/Type";
+import FavoriteIcon from "../components/FavoriteIcon";
+import PokemoDescription from "../components/PokemonDescription";
+import Slider from "../components/Slider";
+import { typeColors } from "../utils/colors";
+import LanguageComponent from "../components/LanguageComponent";
 
 import {
   getPokemonSpeciesAction,
   cleanPokemonSpeciesAction,
-  getPokemonListAction,
   saveMyFavorite,
   deleteMyFavorite,
 } from "../redux/pokemonDuck";
 
-const { height, width } = Dimensions.get("window");
-
-const Type = ({ types }) => {
-  return (
-    <React.Fragment>
-      {types.map((type, index) => {
-        return (
-          <View key={index} style={styles.TypeStyle}>
-            <Text style={styles.TypeStyleText}>{type.type.name}</Text>
-          </View>
-        );
-      })}
-    </React.Fragment>
-  );
-};
-
-const formatingStatsName = (stat) => {
-  let statsMap = {
-    hp: i18n.t("detail.hp"),
-    attack: i18n.t("detail.attack"),
-    defense: i18n.t("detail.defense"),
-    "special-attack": i18n.t("detail.spatk"),
-    "special-defense": i18n.t("detail.spdef"),
-    speed: i18n.t("detail.speed"),
+const SliderPokemonStats = ({ stats, colorType }) => {
+  const formatingStatsName = (stat) => {
+    let statsMap = {
+      hp: i18n.t("detail.hp"),
+      attack: i18n.t("detail.attack"),
+      defense: i18n.t("detail.defense"),
+      "special-attack": i18n.t("detail.spatk"),
+      "special-defense": i18n.t("detail.spdef"),
+      speed: i18n.t("detail.speed"),
+    };
+    return statsMap[stat];
   };
-  return statsMap[stat];
-};
 
-const Slider = ({ label, value }) => {
-  return (
-    <View
-      style={{
-        flexDirection: "column",
-        width: "100%",
-      }}
-    >
-      <View style={{ flexDirection: "row" }}>
-        <View
-          style={{
-            backgroundColor: "white",
-            width: width - 280,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingRight: 10,
-          }}
-        >
-          <Text>{label}</Text>
-          <Text>{value}</Text>
-        </View>
-        <View
-          style={{
-            backgroundColor: "grey",
-            flex: 1,
-            height: 7,
-            marginBottom: 20,
-            marginTop: 5,
-            borderTopRightRadius: 5,
-            borderTopLeftRadius: 5,
-            borderBottomLeftRadius: 5,
-            borderBottomRightRadius: 5,
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "red",
-              height: 7,
-              width: `${value}%`,
-              borderTopRightRadius: 5,
-              borderTopLeftRadius: 5,
-              borderBottomLeftRadius: 5,
-              borderBottomRightRadius: 5,
-            }}
-          ></View>
-        </View>
-      </View>
-    </View>
-  );
-};
+  // get range to avoid slider overflow
+  const statsArray = stats.map((item) => item.base_stat);
+  const getMaxValue = Math.max(...statsArray);
+  const range = getMaxValue / 100;
 
-const SliderPokemonStats = ({ stats }) => {
   return (
     <React.Fragment>
       {stats.map((stat, index) => {
@@ -110,6 +50,8 @@ const SliderPokemonStats = ({ stats }) => {
             key={index}
             label={formatingStatsName(stat.stat.name)}
             value={stat.base_stat}
+            range={range}
+            colorType={colorType}
           />
         );
       })}
@@ -117,52 +59,29 @@ const SliderPokemonStats = ({ stats }) => {
   );
 };
 
-const getRandomFavlorText = (items) => {
-  if (items && items.length > 0) {
-    return items[Math.floor(Math.random() * items.length)];
-  } else {
-    return i18n.t("detail.emptydescription");
-  }
-};
-
-const TextPokemoDescription = ({ items }) => {
+const HeightAndWeight = ({ height, weight, colorType }) => {
   return (
     <View
       style={{
-        flex: 1,
-        justifyContent: "center",
+        flexDirection: "row",
+        justifyContent: "space-around",
+        width: "100%",
+        alignSelf: "center",
       }}
     >
-      <View
-        style={{
-          marginTop: 10,
-          marginBottom: 15,
-          width: "100%",
-        }}
-      >
-        <Text style={{ textAlign: "justify", fontSize: 16 }}>
-          {`${getRandomFavlorText(items)}`} {i18n.t("detail.randomdescription")}
+      <View style={styles.CardBodyRow}>
+        <Text style={[styles.CardBodyAboutValue, { color: colorType }]}>
+          {height}
         </Text>
+        <Text style={styles.CardBodyAboutLabel}>{i18n.t("detail.height")}</Text>
+      </View>
+      <View style={styles.CardBodyRow}>
+        <Text style={[styles.CardBodyAboutValue, { color: colorType }]}>
+          {weight}
+        </Text>
+        <Text style={styles.CardBodyAboutLabel}>{i18n.t("detail.weight")}</Text>
       </View>
     </View>
-  );
-};
-
-const FavoriteIcon = ({ isFavorite, onPress }) => {
-  //const [isFavorite, setIsFavorite] = useState(isFavorite);
-  const handleOnPress = () => {
-    //setIsFavorite(!isFavorite);
-    onPress(!isFavorite);
-  };
-
-  return (
-    <TouchableOpacity onPress={() => handleOnPress()}>
-      <FontAwesome
-        name={isFavorite ? "heart" : "heart-o"}
-        size={25}
-        color={"red"}
-      />
-    </TouchableOpacity>
   );
 };
 
@@ -180,6 +99,8 @@ const Detail = ({ route }) => {
   const navigation = useNavigation();
   const languages = useSelector((state) => state.pokemonReducer.languages);
   const [languageChanged, setLanguageChanged] = useState(i18n.locale);
+  const pickFirstType = pokemon.types.find((e) => !!e);
+  const getColorType = typeColors[pickFirstType.type.name];
 
   useEffect(() => {
     i18n.locale = languages[currentLanguageIndex];
@@ -197,7 +118,6 @@ const Detail = ({ route }) => {
 
     return () => {
       dispatch(cleanPokemonSpeciesAction());
-      //dispatch(getPokemonListAction());
     };
   }, []);
 
@@ -218,60 +138,49 @@ const Detail = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.Container}>
-      <ScrollView style={styles.ContainerScroll}>
-        <View style={styles.Card}>
-          <View style={styles.CardHeader}>
-            <View style={styles.CardHeaderTitle}>
-              <Text style={styles.CardHeaderTitleName}>{pokemon.name}</Text>
-              <View style={styles.CardHeaderGroup}>
-                <FavoriteIcon
-                  isFavorite={isFavorite}
-                  onPress={handleFavorite}
-                />
-                <Text style={styles.CardHeaderTitleNumber}>
-                  #{pokemon.id.toString().padStart(3, "0")}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.CardHeaderSubtitle}>
-              <Type types={pokemon.types} />
-            </View>
-            <Image
-              source={{
-                uri: pokemon.spriteDeafult,
-              }}
-              style={styles.CardImage}
-            />
+      <LanguageComponent />
+      <ScrollView>
+        <View
+          style={[
+            styles.Card,
+            {
+              backgroundColor: getColorType,
+            },
+          ]}
+        >
+          <Text style={styles.CardHeaderTitleNumber}>
+            #{pokemon.id.toString().padStart(3, "0")}
+          </Text>
+          <View style={styles.CardHeaderTitle}>
+            <Text style={styles.CardHeaderTitleName}>{pokemon.name}</Text>
+            <FavoriteIcon isFavorite={isFavorite} onPress={handleFavorite} />
           </View>
+          <View style={styles.CardHeaderSubtitle}>
+            <Type types={pokemon.types} />
+          </View>
+          <Image
+            source={{
+              uri: pokemon.spriteDeafult,
+            }}
+            style={styles.CardImage}
+          />
+
           <View style={styles.CardBody}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-around",
-                width: "100%",
-                alignSelf: "center",
-              }}
-            >
-              <View style={styles.CardBodyRow}>
-                <Text style={styles.CardBodyAboutValue}>{pokemon.height}</Text>
-                <Text style={styles.CardBodyAboutLabel}>
-                  {i18n.t("detail.height")}
-                </Text>
-              </View>
-              <View style={styles.CardBodyRow}>
-                <Text style={styles.CardBodyAboutValue}>{pokemon.weight}</Text>
-                <Text style={styles.CardBodyAboutLabel}>
-                  {i18n.t("detail.weight")}
-                </Text>
-              </View>
-            </View>
+            <HeightAndWeight
+              colorType={getColorType}
+              height={pokemon.height}
+              weight={pokemon.weight}
+            />
             {useMemo(
               () => (
-                <TextPokemoDescription items={pokemonSpecies[i18n.locale]} />
+                <PokemoDescription items={pokemonSpecies[i18n.locale]} />
               ),
               [pokemonSpecies[i18n.locale]]
             )}
-            <SliderPokemonStats stats={pokemon.stats} />
+            <SliderPokemonStats
+              colorType={getColorType}
+              stats={pokemon.stats}
+            />
           </View>
         </View>
       </ScrollView>
@@ -283,9 +192,7 @@ const styles = StyleSheet.create({
   Container: {
     flex: 1,
   },
-  ContainerScroll: {},
   Card: {
-    backgroundColor: "pink",
     marginTop: 10,
     marginRight: 10,
     marginLeft: 10,
@@ -303,18 +210,12 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     elevation: 6,
   },
-  CardHeader: {},
-  CardHeaderGroup: {
-    flexDirection: "row",
-  },
-  CardHeaderIconFavorite: {},
   CardHeaderTitle: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginLeft: 20,
     marginRight: 20,
-    marginTop: 20,
   },
   CardHeaderSubtitle: {
     flexDirection: "row",
@@ -329,7 +230,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#fff",
-    marginLeft: 10,
+    marginTop: 20,
+    marginLeft: 20,
   },
   CardHeaderSubTitle: {
     alignSelf: "center",
@@ -350,30 +252,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   CardBodyAboutValue: { fontSize: 20, color: "red", fontWeight: "bold" },
-  CardBodyAboutLabel: { fontSize: 13, color: "lightgrey" },
+  CardBodyAboutLabel: { fontSize: 12, color: "#757575" },
   CardImage: {
     height: 300,
-    width: "90%",
+    aspectRatio: 1,
     alignSelf: "center",
-    marginTop: 10,
-    backgroundColor: "red",
-  },
-  TypeStyle: {
-    backgroundColor: "red",
-    borderBottomLeftRadius: 14,
-    borderBottomRightRadius: 14,
-    borderTopRightRadius: 14,
-    borderTopLeftRadius: 14,
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingBottom: 3,
-    marginRight: 5,
-    marginTop: 5,
-    height: 30,
-    justifyContent: "center",
-  },
-  TypeStyleText: {
-    color: "#fff",
   },
 });
 

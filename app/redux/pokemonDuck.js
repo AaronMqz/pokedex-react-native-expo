@@ -1,18 +1,18 @@
 import { useAPI } from "../service/useAPI";
 import useStorage from "../hooks/useStorage";
+import { API_URL } from "../service/serviceConfig";
 
 // CONSTANTS
 let initalData = {
   isFetching: false,
-  nextPage: "https://pokeapi.co/api/v2/pokemon?limit=50",
+  nextPage: API_URL,
   pokemons: [],
   currentPokemonSpecies: {},
-  community: [],
   myFavorites: [],
-  user: { name: "aaron" },
   languages: ["en", "es"],
   currentLanguageIndex: 0,
 };
+
 let FETCH_REQUEST = "FETCH_REQUEST";
 let FECTH_SUCCESS = "FECTH_SUCCESS";
 let FETCH_FAILURE = "FETCH_FAILURE";
@@ -22,6 +22,7 @@ let SAVE_FAVORITE = "SAVE_FAVORITE";
 let DELETE_FAVORITE = "DELETE_FAVORITE";
 let GET_FAVORITES = "GET_FAVORITES";
 let CHANGE_LANGUAGE = "CHANGE_LANGUAGE";
+let RESEST_POKEMONS = "RESEST_POKEMONS";
 
 // REDUCERS
 export default reducer = (state = initalData, { type, payload }) => {
@@ -70,6 +71,12 @@ export default reducer = (state = initalData, { type, payload }) => {
       return {
         ...state,
         myFavorites: payload,
+      };
+    case RESEST_POKEMONS:
+      return {
+        ...state,
+        pokemons: [],
+        nextPage: API_URL,
       };
     default:
       return state;
@@ -196,4 +203,9 @@ export let getMyFavorites = () => (dispatch) => {
 
 export let changeLanguage = (language) => (dispatch) => {
   dispatch({ type: CHANGE_LANGUAGE, payload: language });
+};
+
+export let resetPokemonsAction = () => (dispatch) => {
+  dispatch({ type: RESEST_POKEMONS });
+  getPokemonSpeciesAction(initalData.nextPage);
 };

@@ -10,12 +10,15 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { SearchBar } from "react-native-elements";
 import { useSelector, useDispatch } from "react-redux";
 
-import { getPokemonListAction } from "../redux/pokemonDuck";
-import LanguageComponent from "../components/LanguageComponent";
+import {
+  getPokemonListAction,
+  resetPokemonsAction,
+} from "../redux/pokemonDuck";
 import i18n from "../languages/i18n";
 
 const { width } = Dimensions.get("window");
@@ -44,6 +47,30 @@ const Search = () => {
     });
   }, [languageChanged]);
 
+  const handleReset = () => {
+    dispatch(resetPokemonsAction());
+    dispatch(getPokemonListAction(nextPage));
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: () => (
+        <Image
+          source={require("../../assets/pokemon.png")}
+          style={{ width: 80, height: 30 }}
+        />
+      ),
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => handleReset()}
+          style={{ marginRight: 15 }}
+        >
+          {!loading && <FontAwesome name="undo" size={20} color={"#fff"} />}
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, loading]);
+
   const handleSearch = (value) => {
     setSearchText(value);
   };
@@ -69,6 +96,7 @@ const Search = () => {
   const renderItem = ({ item }) => {
     return (
       <TouchableOpacity
+        disabled={loading}
         onPress={() => navigation.navigate("Detail", { pokemon: item })}
       >
         <View style={styles.Card}>
@@ -84,14 +112,16 @@ const Search = () => {
 
   return (
     <SafeAreaView style={styles.Conatiner}>
-      <LanguageComponent />
       <SearchBar
         round
-        placeholder={i18n.t("search.searchBarPlaceholder")}
+        placeholder={`${i18n.t("search.searchBarPlaceholder")} ${
+          pokemons.length
+        } ${i18n.t("search.result")}`}
         lightTheme={true}
         onChangeText={handleSearch}
         value={searchText}
         showCancel={false}
+        inputContainerStyle={{ height: 40 }}
       />
       <Text
         style={{
@@ -107,7 +137,7 @@ const Search = () => {
       <FlatList
         data={filterPokemons()}
         renderItem={renderItem}
-        keyExtractor={(item) => item.name}
+        keyExtractor={(item) => item.name + item.id}
         numColumns={3}
         columnWrapperStyle={{
           marginTop: 5,
