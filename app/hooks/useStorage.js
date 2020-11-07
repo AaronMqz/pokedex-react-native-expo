@@ -6,7 +6,6 @@ const useStorage = () => {
     try {
       const jsonValue = JSON.stringify(data);
       await AsyncStorage.setItem("@pokemons", jsonValue);
-      //console.log(JSON.parse(JSON.stringify(jsonValue)));
     } catch (e) {
       // saving error
       console.log("Error saving in storage: ", e);

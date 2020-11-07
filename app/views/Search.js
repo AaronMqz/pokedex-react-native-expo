@@ -49,7 +49,6 @@ const Search = () => {
 
   const handleReset = () => {
     dispatch(resetPokemonsAction());
-    dispatch(getPokemonListAction(nextPage));
   };
 
   useLayoutEffect(() => {

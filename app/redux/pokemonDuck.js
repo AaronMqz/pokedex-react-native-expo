@@ -207,5 +207,5 @@ export let changeLanguage = (language) => (dispatch) => {
 
 export let resetPokemonsAction = () => (dispatch) => {
   dispatch({ type: RESEST_POKEMONS });
-  getPokemonSpeciesAction(initalData.nextPage);
+  getPokemonListAction(initalData.nextPage)(dispatch);
 };
