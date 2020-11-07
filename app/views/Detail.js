@@ -203,16 +203,16 @@ const Detail = ({ route }) => {
 
   useEffect(() => {
     let favoriteFound = myFavorites.filter((item) => {
-      return pokemon.name === item;
+      return pokemon.name === item.name;
     });
     setIsFavorite(favoriteFound.length > 0 ? true : false);
   }, [myFavorites]);
 
   const handleFavorite = (value) => {
     if (value) {
-      dispatch(saveMyFavorite(pokemon.name));
+      dispatch(saveMyFavorite(pokemon));
     } else {
-      dispatch(deleteMyFavorite(pokemon.name));
+      dispatch(deleteMyFavorite(pokemon));
     }
   };
 

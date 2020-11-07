@@ -20,6 +20,7 @@ let FECTH_SPECIES_SUCCESS = "FECTH_SPECIES_SUCCESS";
 let CLEAN_SPECIES = "CLEAN_SPECIES";
 let SAVE_FAVORITE = "SAVE_FAVORITE";
 let DELETE_FAVORITE = "DELETE_FAVORITE";
+let GET_FAVORITES = "GET_FAVORITES";
 let CHANGE_LANGUAGE = "CHANGE_LANGUAGE";
 
 // REDUCERS
@@ -64,6 +65,11 @@ export default reducer = (state = initalData, { type, payload }) => {
       return {
         ...state,
         currentLanguageIndex: payload,
+      };
+    case GET_FAVORITES:
+      return {
+        ...state,
+        myFavorites: payload,
       };
     default:
       return state;
@@ -158,10 +164,34 @@ export let cleanPokemonSpeciesAction = () => (dispatch) => {
 
 export let saveMyFavorite = (favorite) => (dispatch) => {
   dispatch({ type: SAVE_FAVORITE, payload: favorite });
+
+  const saveInStorage = async () => {
+    const { saveFavoriteStorage } = useStorage();
+    await saveFavoriteStorage(favorite);
+  };
+  saveInStorage();
 };
 
 export let deleteMyFavorite = (favorite) => (dispatch) => {
   dispatch({ type: DELETE_FAVORITE, payload: favorite });
+
+  const saveInStorage = async () => {
+    const { saveFavoriteStorage } = useStorage();
+    await saveFavoriteStorage(favorite);
+  };
+  saveInStorage();
+};
+
+export let getMyFavorites = () => (dispatch) => {
+  const getFavoriteFromStorage = async () => {
+    const { getFavoriteStorage } = useStorage();
+    const resultStorage = await getFavoriteStorage();
+    dispatch({
+      type: FECTH_SUCCESS,
+      payload: resultStorage,
+    });
+  };
+  getFavoriteFromStorage();
 };
 
 export let changeLanguage = (language) => (dispatch) => {

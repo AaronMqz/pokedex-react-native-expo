@@ -22,7 +22,43 @@ const useStorage = () => {
     }
   };
 
-  return { savePokemonListStorage, getPokemonListStorage };
+  const saveFavoriteStorage = async (data) => {
+    try {
+      const jsonValue = JSON.stringify(data);
+      await AsyncStorage.setItem("@favorites", jsonValue);
+    } catch (e) {
+      // saving error
+      console.log("Error saving favorites in storage: ", e);
+    }
+  };
+
+  const deleteFavoriteStorage = async (data) => {
+    try {
+      const jsonValue = JSON.stringify(data);
+      await AsyncStorage.setItem("@favorites", jsonValue);
+    } catch (e) {
+      // saving error
+      console.log("Error deleting favorites in storage: ", e);
+    }
+  };
+
+  const getFavoriteStorage = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("@favorites");
+      return jsonValue != null ? JSON.parse(jsonValue) : [];
+    } catch (e) {
+      // error reading value
+      console.log("Error getting from storage: ", e);
+    }
+  };
+
+  return {
+    savePokemonListStorage,
+    getPokemonListStorage,
+    saveFavoriteStorage,
+    deleteFavoriteStorage,
+    getFavoriteStorage,
+  };
 };
 
 export default useStorage;

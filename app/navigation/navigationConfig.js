@@ -42,6 +42,10 @@ export const navigationConfig = {
           name: "Favorites",
           component: Favorites,
         },
+        {
+          name: "Detail",
+          component: Detail,
+        },
       ],
     },
     {
