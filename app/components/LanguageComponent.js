@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ButtonGroup } from "react-native-elements";
 import { changeLanguage } from "../redux/pokemonDuck";
 import { useSelector, useDispatch } from "react-redux";
+import i18n from "../languages/i18n";
 
 const OptionsComponent = ({ handleChangeLanguage, index }) => {
   return (

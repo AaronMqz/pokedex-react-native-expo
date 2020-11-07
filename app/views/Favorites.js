@@ -17,7 +17,7 @@ const Favorites = () => {
   const myFavorites = useSelector((state) => state.pokemonReducer.myFavorites);
 
   const onSave = (value) => {
-    console.log("saving", value);
+    //console.log("saving", value);
     //dispatch(saveMyFavorite(value))
   };
 

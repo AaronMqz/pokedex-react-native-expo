@@ -1,0 +1,25 @@
+{
+  "appName": "Pokedex",
+  "navigation": {
+    "search": "Buscar",
+    "favorites": "Favoritos",
+    "community": "Comunidad",
+    "detail": "Detalle"
+  },
+  "search": {
+    "result": "Resutados",
+    "searchBarPlaceholder": "Buscar Pokemon"
+  },
+  "detail": {
+    "height": "Altura",
+    "weight": "Peso",
+    "hp": "Poder",
+    "attack": "Ataque",
+    "defense": "Defensa",
+    "spatk": "Ataque Ep",
+    "spdef": "Defensa Ep",
+    "speed": "Velocidad",
+    "randomdescription": "(descripcion aleatoria)",
+    "emptydescription": "Descripcion Vacia"
+  }
+}

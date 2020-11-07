@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useLayoutEffect } from "react";
 import {
   SafeAreaView,
   View,
@@ -10,6 +10,9 @@ import {
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { FontAwesome } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/native";
+import i18n from "../languages/i18n";
 
 import {
   getPokemonSpeciesAction,
@@ -18,7 +21,6 @@ import {
   saveMyFavorite,
   deleteMyFavorite,
 } from "../redux/pokemonDuck";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 const { height, width } = Dimensions.get("window");
 
@@ -38,12 +40,12 @@ const Type = ({ types }) => {
 
 const formatingStatsName = (stat) => {
   let statsMap = {
-    hp: "HP",
-    attack: "Attack",
-    defense: "Defense",
-    "special-attack": "Sp Atk",
-    "special-defense": "Sp Def",
-    speed: "Speed",
+    hp: i18n.t("detail.hp"),
+    attack: i18n.t("detail.attack"),
+    defense: i18n.t("detail.defense"),
+    "special-attack": i18n.t("detail.spatk"),
+    "special-defense": i18n.t("detail.spdef"),
+    speed: i18n.t("detail.speed"),
   };
   return statsMap[stat];
 };
@@ -119,15 +121,11 @@ const getRandomFavlorText = (items) => {
   if (items && items.length > 0) {
     return items[Math.floor(Math.random() * items.length)];
   } else {
-    return "Empty Description";
+    return i18n.t("detail.emptydescription");
   }
 };
 
 const TextPokemoDescription = ({ items }) => {
-  /*const memoGetRandomFavlorText = useMemo(() => getRandomFavlorText(items), [
-    items,
-  ]);*/
-
   return (
     <View
       style={{
@@ -143,7 +141,7 @@ const TextPokemoDescription = ({ items }) => {
         }}
       >
         <Text style={{ textAlign: "justify", fontSize: 16 }}>
-          {`${getRandomFavlorText(items)}`}
+          {`${getRandomFavlorText(items)}`} {i18n.t("detail.randomdescription")}
         </Text>
       </View>
     </View>
@@ -176,6 +174,23 @@ const Detail = ({ route }) => {
   );
   const myFavorites = useSelector((state) => state.pokemonReducer.myFavorites);
   const [isFavorite, setIsFavorite] = useState(false);
+  const currentLanguageIndex = useSelector(
+    (state) => state.pokemonReducer.currentLanguageIndex
+  );
+  const navigation = useNavigation();
+  const languages = useSelector((state) => state.pokemonReducer.languages);
+  const [languageChanged, setLanguageChanged] = useState(i18n.locale);
+
+  useEffect(() => {
+    i18n.locale = languages[currentLanguageIndex];
+    setLanguageChanged(i18n.locale);
+  }, [currentLanguageIndex]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: i18n.t("navigation.detail"),
+    });
+  }, [languageChanged]);
 
   useEffect(() => {
     dispatch(getPokemonSpeciesAction(pokemon.speciesUrl));
@@ -239,18 +254,22 @@ const Detail = ({ route }) => {
             >
               <View style={styles.CardBodyRow}>
                 <Text style={styles.CardBodyAboutValue}>{pokemon.height}</Text>
-                <Text style={styles.CardBodyAboutLabel}>Heigth</Text>
+                <Text style={styles.CardBodyAboutLabel}>
+                  {i18n.t("detail.height")}
+                </Text>
               </View>
               <View style={styles.CardBodyRow}>
                 <Text style={styles.CardBodyAboutValue}>{pokemon.weight}</Text>
-                <Text style={styles.CardBodyAboutLabel}>Weight</Text>
+                <Text style={styles.CardBodyAboutLabel}>
+                  {i18n.t("detail.weight")}
+                </Text>
               </View>
             </View>
             {useMemo(
               () => (
-                <TextPokemoDescription items={pokemonSpecies["en"]} />
+                <TextPokemoDescription items={pokemonSpecies[i18n.locale]} />
               ),
-              [pokemonSpecies["en"]]
+              [pokemonSpecies[i18n.locale]]
             )}
             <SliderPokemonStats stats={pokemon.stats} />
           </View>

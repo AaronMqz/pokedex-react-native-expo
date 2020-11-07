@@ -1,0 +1,25 @@
+{
+  "appName": "Pokedex",
+  "navigation": {
+    "search": "Search",
+    "favorites": "Favorites",
+    "community": "Community",
+    "detail": "Detail"
+  },
+  "search": {
+    "result": "Results",
+    "searchBarPlaceholder": "Search Pokemon"
+  },
+  "detail": {
+    "height": "Height",
+    "weight": "Weight",
+    "hp": "HP",
+    "attack": "Attack",
+    "defense": "Defense",
+    "spatk": "Sp Atk",
+    "spdef": "Sp Def",
+    "speed": "Speed",
+    "randomdescription": "(random description)",
+    "emptydescription": "Empty Description"
+  }
+}

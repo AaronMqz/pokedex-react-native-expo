@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   Text,
   View,
@@ -16,6 +16,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { getPokemonListAction } from "../redux/pokemonDuck";
 import LanguageComponent from "../components/LanguageComponent";
+import i18n from "../languages/i18n";
 
 const { width } = Dimensions.get("window");
 
@@ -26,6 +27,22 @@ const Search = () => {
   const pokemons = useSelector((state) => state.pokemonReducer.pokemons);
   const nextPage = useSelector((state) => state.pokemonReducer.nextPage);
   const loading = useSelector((state) => state.pokemonReducer.isFetching);
+  const currentLanguageIndex = useSelector(
+    (state) => state.pokemonReducer.currentLanguageIndex
+  );
+  const languages = useSelector((state) => state.pokemonReducer.languages);
+  const [languageChanged, setLanguageChanged] = useState(i18n.locale);
+
+  useEffect(() => {
+    i18n.locale = languages[currentLanguageIndex];
+    setLanguageChanged(i18n.locale);
+  }, [currentLanguageIndex]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: i18n.t("navigation.search"),
+    });
+  }, [languageChanged]);
 
   const handleSearch = (value) => {
     setSearchText(value);
@@ -70,7 +87,7 @@ const Search = () => {
       <LanguageComponent />
       <SearchBar
         round
-        placeholder="Search"
+        placeholder={i18n.t("search.searchBarPlaceholder")}
         lightTheme={true}
         onChangeText={handleSearch}
         value={searchText}
@@ -85,7 +102,7 @@ const Search = () => {
           fontSize: 10,
         }}
       >
-        Results: {pokemons.length}
+        {i18n.t("search.result")} {pokemons.length}
       </Text>
       <FlatList
         data={filterPokemons()}
