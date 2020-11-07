@@ -61,7 +61,7 @@ export default reducer = (state = initalData, { type, payload }) => {
     case SAVE_FAVORITE:
       return {
         ...state,
-        myFavorites: state.pokemons.concat(payload),
+        myFavorites: state.myFavorites.concat(payload),
         isFetching: false,
       };
     case DELETE_FAVORITE:
@@ -182,12 +182,12 @@ export let cleanPokemonSpeciesAction = () => (dispatch) => {
   dispatch({ type: CLEAN_SPECIES });
 };
 
-export let saveMyFavorite = (favorite) => (dispatch) => {
+export let saveMyFavorite = (favorite) => (dispatch, getState) => {
   dispatch({ type: SAVE_FAVORITE, payload: favorite });
 
   const saveInStorage = async () => {
     const { saveFavoriteStorage } = useStorage();
-    await saveFavoriteStorage(favorite);
+    await saveFavoriteStorage(getState().pokemonReducer.myFavorites);
   };
   saveInStorage();
 };

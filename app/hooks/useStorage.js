@@ -45,7 +45,7 @@ const useStorage = () => {
   const getFavoriteStorage = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem("@favorites");
-      return jsonValue != null ? JSON.parse(jsonValue) : [];
+      return jsonValue != null ? [].concat(JSON.parse([jsonValue])) : [];
     } catch (e) {
       // error reading value
       console.log("Error getting from storage: ", e);
