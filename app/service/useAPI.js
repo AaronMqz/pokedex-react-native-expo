@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_URL } from "./serviceConfig";
 
 const mapData = (data) => {
   return {
@@ -29,6 +30,18 @@ export const useAPI = () => {
     return Promise.all(getAllRequest);
   };
 
+  const getPokemon = (pokemon) => {
+    let url = API_URL + "/" + pokemon;
+    return axios
+      .get(url)
+      .then(({ data }) => {
+        return mapData(data);
+      })
+      .catch((error) => {
+        throw error;
+      });
+  };
+
   const getPokemonSpecies = (url) => {
     let result = axios.get(url);
     return result;
@@ -38,5 +51,6 @@ export const useAPI = () => {
     getPokemonList,
     getPokemonSpecies,
     getPokemonDetails,
+    getPokemon,
   };
 };

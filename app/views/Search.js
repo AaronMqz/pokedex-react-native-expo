@@ -18,6 +18,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   getPokemonListAction,
   resetPokemonsAction,
+  getPokemonByNameOrId,
 } from "../redux/pokemonDuck";
 import i18n from "../languages/i18n";
 
@@ -35,6 +36,7 @@ const Search = () => {
   );
   const languages = useSelector((state) => state.pokemonReducer.languages);
   const [languageChanged, setLanguageChanged] = useState(i18n.locale);
+  const [searchByButton, setSearchByButton] = useState(false);
 
   useEffect(() => {
     i18n.locale = languages[currentLanguageIndex];
@@ -46,10 +48,6 @@ const Search = () => {
       headerTitle: i18n.t("navigation.search"),
     });
   }, [languageChanged]);
-
-  const handleReset = () => {
-    dispatch(resetPokemonsAction());
-  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -64,18 +62,31 @@ const Search = () => {
           onPress={() => handleReset()}
           style={{ marginRight: 15 }}
         >
-          {!loading && <FontAwesome name="undo" size={20} color={"#fff"} />}
+          {!loading && !searchByButton && (
+            <FontAwesome name="undo" size={20} color={"#fff"} />
+          )}
         </TouchableOpacity>
       ),
     });
-  }, []);
+  }, [loading]);
+
+  useEffect(() => {
+    if (searchText.trim().length === 0 && searchByButton) {
+      setSearchByButton(false);
+      handleReset();
+    }
+  }, [searchText]);
+
+  const handleReset = () => {
+    dispatch(resetPokemonsAction());
+  };
 
   const handleSearch = (value) => {
     setSearchText(value);
   };
 
   const filterPokemons = () => {
-    if (searchText.trim().length > 0) {
+    if (searchText.trim().length > 0 && !searchByButton) {
       var filters = pokemons.filter((pokemon) => {
         return pokemon.name
           .toLowerCase()
@@ -83,7 +94,9 @@ const Search = () => {
       });
       return filters;
     } else {
-      return pokemons;
+      if (!loading || !searchByButton) {
+        return pokemons;
+      }
     }
   };
 
@@ -110,25 +123,76 @@ const Search = () => {
     );
   };
 
+  const SearchButton = ({ handleButtonSearch }) => {
+    return (
+      <React.Fragment>
+        {searchText.trim().length > 0 && (
+          <TouchableOpacity
+            style={{
+              backgroundColor: "#fff",
+              justifyContent: "center",
+              height: 55,
+            }}
+            onPress={handleButtonSearch}
+          >
+            <View
+              style={{
+                height: 40,
+                width: 80,
+                marginRight: 5,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#f03434",
+                borderTopRightRadius: 15,
+                borderTopLeftRadius: 15,
+                borderBottomLeftRadius: 15,
+                borderBottomRightRadius: 15,
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+                {i18n.t("navigation.search")}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      </React.Fragment>
+    );
+  };
+
+  const handleButtonSearch = () => {
+    dispatch(getPokemonByNameOrId(searchText.trim().toLowerCase()));
+    setSearchByButton(true);
+  };
+
   return (
     <SafeAreaView style={styles.Conatiner}>
-      <SearchBar
-        round
-        placeholder={`${i18n.t("search.searchBarPlaceholder")} ${
-          pokemons.length
-        } ${i18n.t("search.result")}`}
-        lightTheme={true}
-        onChangeText={handleSearch}
-        value={searchText}
-        showCancel={false}
-        inputContainerStyle={{ height: 40 }}
-      />
+      <View style={{ flexDirection: "row" }}>
+        <SearchBar
+          round
+          placeholder={`${i18n.t("search.searchBarPlaceholder")} ${
+            pokemons.length
+          } ${i18n.t("search.result")}`}
+          lightTheme={true}
+          onChangeText={handleSearch}
+          value={searchText}
+          showCancel={false}
+          containerStyle={{
+            width: width,
+            height: 55,
+            backgroundColor: "#fff",
+            borderBottomWidth: 0,
+            flex: 1,
+          }}
+          inputContainerStyle={{ height: 40 }}
+        />
+        <SearchButton handleButtonSearch={handleButtonSearch} />
+      </View>
+
       <Text
         style={{
           alignSelf: "flex-end",
           marginRight: 10,
-          marginTop: 2,
-          marginBottom: 2,
+          marginTop: 5,
           fontSize: 10,
         }}
       >
@@ -147,7 +211,7 @@ const Search = () => {
               marginRight: 2,
             }}
             onEndReached={handleMorePokemons}
-            onEndReachedThreshold={2}
+            onEndReachedThreshold={0.5}
             ListFooterComponent={
               loading && (
                 <ActivityIndicator

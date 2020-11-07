@@ -1,11 +1,11 @@
 import { useAPI } from "../service/useAPI";
 import useStorage from "../hooks/useStorage";
-import { API_URL } from "../service/serviceConfig";
+import { API_URL, API_LIMIT } from "../service/serviceConfig";
 
 // CONSTANTS
 let initalData = {
   isFetching: false,
-  nextPage: API_URL,
+  nextPage: API_URL + API_LIMIT,
   pokemons: [],
   currentPokemonSpecies: {},
   myFavorites: [],
@@ -23,6 +23,8 @@ let DELETE_FAVORITE = "DELETE_FAVORITE";
 let GET_FAVORITES = "GET_FAVORITES";
 let CHANGE_LANGUAGE = "CHANGE_LANGUAGE";
 let RESEST_POKEMONS = "RESEST_POKEMONS";
+let FECTH_POKEMON_SUCCESS = "FECTH_POKEMON_SUCCESS";
+let NOT_FOUND = "NOT_FOUND";
 
 // REDUCERS
 export default reducer = (state = initalData, { type, payload }) => {
@@ -34,6 +36,12 @@ export default reducer = (state = initalData, { type, payload }) => {
         ...state,
         pokemons: state.pokemons.concat(payload.pokemons),
         nextPage: payload.nextPage,
+        isFetching: false,
+      };
+    case FECTH_POKEMON_SUCCESS:
+      return {
+        ...state,
+        pokemons: [payload],
         isFetching: false,
       };
     case FETCH_FAILURE:
@@ -76,7 +84,12 @@ export default reducer = (state = initalData, { type, payload }) => {
       return {
         ...state,
         pokemons: [],
-        nextPage: API_URL,
+        nextPage: initalData.nextPage,
+      };
+    case NOT_FOUND:
+      return {
+        ...state,
+        pokemons: [],
       };
     default:
       return state;
@@ -208,4 +221,25 @@ export let changeLanguage = (language) => (dispatch) => {
 export let resetPokemonsAction = () => (dispatch) => {
   dispatch({ type: RESEST_POKEMONS });
   getPokemonListAction(initalData.nextPage)(dispatch);
+};
+
+export let getPokemonByNameOrId = (pokemon) => (dispatch) => {
+  const { getPokemon } = useAPI();
+
+  const fetchData = async () => {
+    try {
+      dispatch({ type: FETCH_REQUEST });
+      const result = await getPokemon(pokemon);
+      dispatch({
+        type: FECTH_POKEMON_SUCCESS,
+        payload: result,
+      });
+    } catch (error) {
+      dispatch({ type: FETCH_FAILURE });
+      dispatch({ type: NOT_FOUND });
+      console.log("Error API::getPokemonByNameOrId: ", error);
+    }
+  };
+
+  return fetchData();
 };
