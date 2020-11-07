@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect, useMemo } from "react";
 import {
   Text,
   View,
@@ -68,7 +68,7 @@ const Search = () => {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, loading]);
+  }, []);
 
   const handleSearch = (value) => {
     setSearchText(value);
@@ -76,11 +76,12 @@ const Search = () => {
 
   const filterPokemons = () => {
     if (searchText.trim().length > 0) {
-      return pokemons.filter((pokemon) => {
+      var filters = pokemons.filter((pokemon) => {
         return pokemon.name
           .toLowerCase()
           .includes(searchText.toLowerCase().trim());
       });
+      return filters;
     } else {
       return pokemons;
     }
@@ -133,29 +134,34 @@ const Search = () => {
       >
         {i18n.t("search.result")} {pokemons.length}
       </Text>
-      <FlatList
-        data={filterPokemons()}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.name + item.id}
-        numColumns={3}
-        columnWrapperStyle={{
-          marginTop: 5,
-          marginLeft: 2,
-          marginRight: 2,
-        }}
-        onEndReached={handleMorePokemons}
-        onEndReachedThreshold={1}
-        ListFooterComponent={
-          loading && (
-            <ActivityIndicator
-              animating
-              size="large"
-              color="red"
-              style={{ marginBottom: 40, marginTop: 30 }}
-            />
-          )
-        }
-      />
+      {useMemo(
+        () => (
+          <FlatList
+            data={filterPokemons()}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.name + item.id}
+            numColumns={3}
+            columnWrapperStyle={{
+              marginTop: 5,
+              marginLeft: 2,
+              marginRight: 2,
+            }}
+            onEndReached={handleMorePokemons}
+            onEndReachedThreshold={2}
+            ListFooterComponent={
+              loading && (
+                <ActivityIndicator
+                  animating
+                  size="large"
+                  color="red"
+                  style={{ marginBottom: 40, marginTop: 30 }}
+                />
+              )
+            }
+          />
+        ),
+        [searchText, pokemons, loading]
+      )}
     </SafeAreaView>
   );
 };

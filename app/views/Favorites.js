@@ -56,12 +56,15 @@ const Favorites = () => {
         onPress={() => navigation.navigate("Detail", { pokemon: item })}
       >
         <LanguageComponent />
-        <View style={styles.Card}>
+        <View style={[styles.Card, { backgroundColor: getColorType }]}>
           <View
             style={{
               flex: 1,
               justifyContent: "center",
               alignItems: "flex-start",
+              borderTopRightRadius: 25,
+              borderBottomRightRadius: 25,
+              backgroundColor: "#fff",
             }}
           >
             <Text style={styles.CardHeaderTitleNumber}>
@@ -72,10 +75,17 @@ const Favorites = () => {
               <Type types={item.types} colorType={getColorType} />
             </View>
           </View>
-          <Image
-            source={{ uri: item.spriteDeafult }}
-            style={styles.CardImage}
-          />
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={{ uri: item.spriteDeafult }}
+              style={styles.CardImage}
+            />
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -110,9 +120,6 @@ const styles = StyleSheet.create({
     marginRight: 2,
     marginLeft: 2,
     marginBottom: 5,
-    padding: 10,
-    paddingLeft: 20,
-    paddingRight: 20,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

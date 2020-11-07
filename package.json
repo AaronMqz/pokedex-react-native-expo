@@ -8,6 +8,7 @@
     "eject": "expo eject",
     "test": "jest"
   },
+  "description": "React Native Pokedex API, this app use Hooks, Redux, Redux devtools for debbuging, AsynStorage for offline, react-navigation, Jest for testing, Internationalization with i18n. ",
   "jest": {
     "preset": "jest-expo"
   },

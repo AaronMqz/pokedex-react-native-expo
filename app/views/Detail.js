@@ -113,9 +113,12 @@ const Detail = ({ route }) => {
   }, []);
 
   useEffect(() => {
-    let favoriteFound = myFavorites.filter((item) => {
-      return pokemon.name === item.name;
-    });
+    var favoriteFound = [];
+    if (myFavorites.length > 0) {
+      favoriteFound = myFavorites.filter((item) => {
+        return pokemon.name === item.name;
+      });
+    }
     setIsFavorite(favoriteFound.length > 0 ? true : false);
   }, [myFavorites]);
 

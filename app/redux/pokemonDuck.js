@@ -53,7 +53,7 @@ export default reducer = (state = initalData, { type, payload }) => {
     case SAVE_FAVORITE:
       return {
         ...state,
-        myFavorites: [...state.myFavorites, payload],
+        myFavorites: state.pokemons.concat(payload),
         isFetching: false,
       };
     case DELETE_FAVORITE:
@@ -194,7 +194,7 @@ export let getMyFavorites = () => (dispatch) => {
     const { getFavoriteStorage } = useStorage();
     const resultStorage = await getFavoriteStorage();
     dispatch({
-      type: FECTH_SUCCESS,
+      type: GET_FAVORITES,
       payload: resultStorage,
     });
   };
