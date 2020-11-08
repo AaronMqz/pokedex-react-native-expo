@@ -64,7 +64,7 @@ npm start
 ```
 ## Test Demo 
 
-To test the app you can run in your device using the Expo Client App:
+To test the app, you can run it on your device using the Expo Client App:
 
 [Pokedex React Native Expo](https://expo.io/@aaronmqz/projects/pokedex-react-native-expo)
 
