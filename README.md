@@ -2,6 +2,21 @@
 
 React Native app using the [Pokedex API](https://pokeapi.co)
 
+# Preview - iOS
+<p align="center" >
+  <img src="/previews/ios.gif" width="25%"/>
+</p>
+           
+# Preview - Android
+<p align="center" >
+    <img src="/previews/android1.jpg" width="25%"/>
+    <img src="/previews/android2.jpg" width="25%"/>
+    <img src="/previews/android3.jpg" width="25%"/>
+    <img src="/previews/android4.jpg" width="25%"/>
+    <img src="/previews/android5.jpg" width="25%"/>
+    <img src="/previews/android6.jpg" width="25%"/>
+</p>                          
+
 ## Features
 
 - Display Pokemons provided by the [Pokedex API](https://pokeapi.co/​) in a Grid View
